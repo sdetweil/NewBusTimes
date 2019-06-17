@@ -194,7 +194,7 @@ Module.register("NewBusTimes", {
         // bus route
         this.createElement("div",wrapper, this.config.classes["tableHeading1"], this.config.lineHeading1+" "+this.config.line)
         // start and end station names
-        this.createElement("div",wrapper,this.config.classes["tableHeading2"], this.config.lineHeading2+" "+this.odata["route"])
+        this.createElement("div",wrapper,this.config.classes["tableHeading2"], this.config.lineHeading2+" "+ schedule.in_stop_name +" <-> "+schedule.out_stop_name)
 
         // if we should show either the schedule name (day of week, lv, s,d)  or the schedule label (leave/return)
         if(this.config.showscheduleName == true || this.config.schedule_label !== undefined){       
