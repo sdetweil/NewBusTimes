@@ -15,6 +15,16 @@
   	background-color: lightblue;
     width: 100%;
 }
+.NewBusTimes .rScheduleHeading {
+  	display: inline-block;
+  	background-color: lightblue;
+    width: 100%;
+}
+.NewBusTimes .rScheduleLabel {
+  	display: inline-block;
+  	background-color: lightblue;
+    width: 100%;
+}
 .NewBusTimes .rTableHead {
   	display: table-cell;
   	padding: 3px 10px;
