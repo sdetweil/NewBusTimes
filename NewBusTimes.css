@@ -1,115 +1,47 @@
- .NewBusTimes .rTable {
+.NewBusTimes {
+ font-size:16px;
+  width:18em;
+}
+.NewBusTimes .rTable {
   	display: table;
-  	width: 100%;
+  	width:18em;
 }
-.NewBusTimes .rTableRow {
+.NewBusTimes .rTableBody {
+  	display: table-row-group;
+  width:18em;
+}
+.NewBusTimes .rTableRow  {
   	display: table-row;
+   width:18em;18
 }
-.NewBusTimes .rTableHeading1 {
+.NewBusTimes .rTableHeading1  {
   	display: inline-block;
   	background-color: red;
-    width: 100%;
+    	width:18em;
 }
 .NewBusTimes .rTableHeading2 {
   	display: inline-block;
   	background-color: lightblue;
-    width: 100%;
+    	width:18em;
 }
 .NewBusTimes .rScheduleHeading {
   	display: inline-block;
   	background-color: lightblue;
-    width: 100%;
+    	width:18em;
 }
-.NewBusTimes .rScheduleLabel {
+.NewBusTimes .rScheduleLabel  {
   	display: inline-block;
   	background-color: lightblue;
-    width: 100%;
+     width:18em;
 }
-.NewBusTimes .rTableHead {
-  	display: table-cell;
-  	padding: 3px 10px;
-  	border: 1px solid #999999;
-}
-.NewBusTimes .lvTableCell {
-  	display: table-cell;
-  	padding: 3px 10px;
-  	border: 1px solid #999999;
-    background-color: green;
-}
+
 .NewBusTimes .rTableCell {
   	display: table-cell;
   	padding: 3px 10px;
   	border: 1px solid #999999;
     background-color: green;
+  width:9em;
 }
-.NewBusTimes .lvTableHeading {
-  	display: table-cell;
-  	padding: 3px 10px;
-  	border: 1px solid #999999;
-    background-color: blue;
-}
-.NewBusTimes .sTableHeading {
-  	display: table-cell;
-  	padding: 3px 10px;
-  	border: 1px solid #999999;
-    background-color: yellow;
-}
-.NewBusTimes .dTableHeading {
-  	display: table-cell;
-  	padding: 3px 10px;
-  	border: 1px solid #999999;
-    background-color: green;
-}
-.NewBusTimes .sTableCell {
-  	display: table-cell;
-  	padding: 3px 10px;
-  	border: 1px solid #999999;
-    background-color: blue;
-}
-.NewBusTimes .dTableCell {
-  	display: table-cell;
-  	padding: 3px 10px;
-  	border: 1px solid #999999;
-    background-color: yellow;
-}
-.NewBusTimes .rTableHeadingBold {
-  	display: table-header-group;
-  	background-color: #red;
-  	font-weight: bold;
-}
-.NewBusTimes .rTableFoot {
-  	display: table-footer-group;
-  	font-weight: bold;
-  	background-color: #ddd;
-}
-.NewBusTimes .rTableBody {
-  	display: table-row-group;
-} 
-/*.NewBusTimes .rTable {
-  	display: block;
-  	width: 100%;
-}
-.NewBusTimes  .rTableHeading, .rTableBody, .rTableFoot, .rTableRow{
-  	clear: both;
-}
-.NewBusTimes  .rTableHead, .rTableFoot{
-  	background-color: #DDD;
-  	font-weight: bold;
-}
-.NewBusTimes .rTableCell, .rTableHead {
-  	border: 1px solid #999999;
-  	float: left;
-  	height: 38px;
-  	/* overflow: hidden; */
-  	padding: 3px 1.8%;
-  	width: 28%;
-    font-size: 15;
-}
-.NewBusTimes .rTable:after {
-  	visibility: hidden;
-  	display: block;
-  	font-size: 0;
-  	content: " ";
-  	clear: both;
-  	height: 0;
-}*/
+
+
+

@@ -17,12 +17,12 @@ module.exports = NodeHelper.create({
 	stop(){
 		console.log(`Stopping module helper: ${this.name}`);
 	},
-  getData(){
+  getData(info){
     let self=this
-          request({url: this.config.url +'/'+ this.config.line+".json", method: "GET"}, function( error, response, body) {
+          request({url:info.url , method: "GET"}, function( error, response, body) {
 
             if(!error && response.statusCode == 200) {
-               self.sendSocketNotification("message_from_helper",JSON.parse(body))
+               self.sendSocketNotification("message_from_helper",{data:JSON.parse(body),id:info.id})
             }
             else {
                 console.log( "sampleModule] " + " ** ERROR ** " + error + " status= "+response.statusCode);
@@ -38,13 +38,9 @@ module.exports = NodeHelper.create({
 			// save payload config info
       console.log("we have config ==================")
 			this.config=payload
-      this.getData()
-     // let data = fs.readFileSync("/home/odroid/MagicMirror/modules/default/SampleModule/sampledata.txt")
-      //console.log("sample data="+data);
-			// wait 15 seconds, send a message back to module
-		//	this.sendSocketNotification("message_from_helper",data.toString())
 		}
-		else if(notification === "????2") {
+		else if(notification === "getinfo") {
+      this.getData(payload)
 		}
 	},
 });

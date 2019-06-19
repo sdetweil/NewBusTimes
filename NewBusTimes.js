@@ -60,7 +60,8 @@ Module.register("NewBusTimes", {
 		// once everybody is loaded up
 		if(notification==="ALL_MODULES_STARTED"){
 			// send our config to our node_helper
-			this.sendSocketNotification("CONFIG",this.config)
+			//this.sendSocketNotification("CONFIG",this.config)
+   this.sendSocketNotification("getinfo",{url:this.config.url +'/'+ this.config.line+".json",id:this.identifier})
 		}
 		if (sender) {
 			Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
@@ -74,11 +75,13 @@ Module.register("NewBusTimes", {
 	socketNotificationReceived: function(notification, payload) {
 		Log.log(this.name + " received a socket notification: " + notification + " - Payload: " + payload);
 		if(notification === "message_from_helper"){
-			this.odata=payload;
-			// tell mirror runtime that our data has changed,
-			// we will be called back at getDom() to provide the updated content
-      setInterval(()=> { this.updateDom(1000)}, 60*1000)
-			this.updateDom(1000)
+   if(payload.id===this.identifier){
+			  this.odata=payload.data;
+  			// tell mirror runtime that our data has changed,
+			  // we will be called back at getDom() to provide the updated content
+     setInterval(()=> { this.updateDom(1000)}, 60*1000)
+		  	this.updateDom(1000)
+   }
 		}
 	},
 
@@ -130,6 +133,7 @@ Module.register("NewBusTimes", {
 	// this is the major worker of the module, it provides the displayable content for this module
 	getDom: function() {
 		var wrapper = document.createElement("div");
+    wrapper.className="NewBusTimes"
     // if we have data from the bus schedule system
     if(this.odata!=undefined){
         let now = new Date()
@@ -154,25 +158,29 @@ Module.register("NewBusTimes", {
         let display_count = this.config.nextDepartures 
         
         // create headings
-        // bus route
-        this.createElement("div",wrapper, this.config.classes["tableHeading1"], this.config.lineHeading1+" "+this.config.line)
+        let table=this.createElement("div",wrapper,this.config.classes["table"])
+        row=this.createElement("div",table,this.config.classes["tableRow"])
+        this.createElement("div",row, this.config.classes["tableHeading1"], this.config.lineHeading1+" "+this.config.line)
         // start and end station names
-        this.createElement("div",wrapper,this.config.classes["tableHeading2"], this.config.lineHeading2+" "+ schedule.in_stop_name +" <-> "+schedule.out_stop_name)
+row=this.createElement("div",table,this.config.classes["tableRow"])
+        this.createElement("div",row,this.config.classes["tableHeading2"], this.config.lineHeading2+" "+ schedule.in_stop_name +" <-> "+schedule.out_stop_name)
 
         // if we should show either the schedule name (day of week, lv, s,d)  or the schedule label (leave/return)
         if(this.config.showscheduleName == true || this.config.schedule_label !== undefined){       
-          // let body=this.createElement("div",table,this.config.classes["tableBody"] )
+          table=this.createElement("div",table,this.config.classes["tableBody"] )
               
                 // the schedule lable (lv = mon-fri, s = sat, d = sun), if requested
-                if(this.config.showscheduleName !== undefined && this.config.showscheduleName == true){                 
-                  this.createElement("div",wrapper,this.config.classes["scheduleHeading"], this.config.dayLabel +" "+this.weekday_key[now.getDay()])
+                if(this.config.showscheduleName !== undefined && this.config.showscheduleName == true){   
+																		row=this.createElement("div",table,this.config.classes["tableRow"])              
+                  this.createElement("div",row,this.config.classes["scheduleHeading"], this.config.dayLabel +" "+this.weekday_key[now.getDay()])
                 }
                 // and any label the user wants to show
-                if(this.config.schedule_label !== undefined){                
-                  this.createElement("div",wrapper,this.config.classes["scheduleLabel"], this.config.schedule_label) 
+                if(this.config.schedule_label !== undefined){ 
+                  row=this.createElement("div",table,this.config.classes["tableRow"])               
+                  this.createElement("div",row,this.config.classes["scheduleLabel"], this.config.schedule_label) 
                 }
         }
-        let table=this.createElement("div",wrapper,this.config.classes["table"])         
+        //let table=this.createElement("div",wrapper,this.config.classes["table"])         
         // now create the table of useful departure times
         body=this.createElement("div",table,this.config.classes["tableBody"] )    
         // loop thru the scheduled departures
@@ -180,7 +188,7 @@ Module.register("NewBusTimes", {
         let leave = this.getTimes(schedule.out,current_time,display_count)
         let ret = this.getTimes(schedule.ret,current_time, display_count)
         // in the lengths are uneven 
-        if(leave.length <ret.length)
+       /* if(leave.length <ret.length)
           //add an entry to leave side
           leave.unshift(" ")
         else{
@@ -188,7 +196,7 @@ Module.register("NewBusTimes", {
           if(this.compareTime(leave[0], ret[0])>0)
             // add a dummy entry to the leave side
             leave.unshift(" ")
-        }
+        }*/
         // loop thru the selected departure times,
         // using the highest count
         for(let c =0; c<Math.max(leave.length,ret.length); c++){
