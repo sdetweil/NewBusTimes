@@ -25,7 +25,8 @@ Module.register("NewBusTimes", {
               "tableBody":"rTableBody",
               "tableRow":"rTableRow",
               "tableCell":"rTableCell"
-    }
+    },
+	showEarliestDeparture: false,
 	},
 
 	init: function(){
@@ -187,8 +188,9 @@ row=this.createElement("div",table,this.config.classes["tableRow"])
         // getting up to display_count entries after the current time (including any travel to stop time)
         let leave = this.getTimes(schedule.out,current_time,display_count)
         let ret = this.getTimes(schedule.ret,current_time, display_count)
+        if(this.config.showEarliestDeparture){
         // in the lengths are uneven 
-       /* if(leave.length <ret.length)
+        if(leave.length <ret.length)
           //add an entry to leave side
           leave.unshift(" ")
         else{
@@ -196,7 +198,8 @@ row=this.createElement("div",table,this.config.classes["tableRow"])
           if(this.compareTime(leave[0], ret[0])>0)
             // add a dummy entry to the leave side
             leave.unshift(" ")
-        }*/
+        }
+	}
         // loop thru the selected departure times,
         // using the highest count
         for(let c =0; c<Math.max(leave.length,ret.length); c++){
