@@ -1,11 +1,11 @@
+var mn = document.currentScript.src.replace(/\/\//g,"/").split('/').slice(-2, -1)[0];
 /*
 
 NewBusTimes
 
 
  */
-
-Module.register("NewBusTimes", {
+Module.register(mn, {
 	// define variables used by module, but not in config data
   weekday_key:["d","lv","lv","lv","lv","lv","s"],
 
@@ -27,6 +27,8 @@ Module.register("NewBusTimes", {
               "tableCell":"rTableCell"
     },
 	showEarliestDeparture: false,
+	float: "",
+	spacing: "",
 	},
 
 	init: function(){
@@ -46,7 +48,7 @@ Module.register("NewBusTimes", {
 	// return list of stylesheet files to use if any
 	getStyles: function() {
       Log.log("returning our styleheet")
-  return ["NewBusTimes.css"]
+  return [mn+".css"]
 
 	},
 
@@ -132,98 +134,106 @@ Module.register("NewBusTimes", {
     return r;
   }, 
 	// this is the major worker of the module, it provides the displayable content for this module
-	getDom: function() {
-		var wrapper = document.createElement("div");
-    wrapper.className="NewBusTimes"
+  getDom: function() {
+	var wrapper = document.createElement("div");	
+    //wrapper.className=mn
+		if(this.config.float!== ""){
+			document.getElementById(this.identifier).style.float=this.config.float;
+			if(this.config.spacing !=="")
+				document.getElementById(this.identifier).style.marginLeft=this.config.spacing
+		}	
+
     // if we have data from the bus schedule system
     if(this.odata!=undefined){
-        let now = new Date()
-        if(this.config.travelTime !== undefined)
-          now = this.addMinutes(now, this.config.travelTime );
-        let current_time=now.getHours() + ":" + now.getMinutes();        
-        // get only the schedule that applies to today
-        let schedule = this.odata.station[this.weekday_key[now.getDay()]]
-        // if we haven't separated the departures yet
-        if(schedule.out == undefined){
-          // create separate lists for outgoing and returning
-          schedule.out=[]
-          schedule.ret =[]
-          for(let departure of schedule.lines ){
-            if(departure[0] !=="")
-              schedule.out.push(departure[0])
-            if(departure[1] !=="")            
-              schedule.ret.push(departure[1])
-          }
-        }
-        // get the limit of elements to show
-        let display_count = this.config.nextDepartures 
-        
-        // create headings
-        let table=this.createElement("div",wrapper,this.config.classes["table"])
-        row=this.createElement("div",table,this.config.classes["tableRow"])
-        this.createElement("div",row, this.config.classes["tableHeading1"], this.config.lineHeading1+" "+this.config.line)
-        // start and end station names
-row=this.createElement("div",table,this.config.classes["tableRow"])
-        this.createElement("div",row,this.config.classes["tableHeading2"], this.config.lineHeading2+" "+ schedule.in_stop_name +" <-> "+schedule.out_stop_name)
+			let now = new Date()
+			if(this.config.travelTime !== undefined)
+				now = this.addMinutes(now, this.config.travelTime );
+			let current_time=now.getHours() + ":" + now.getMinutes();        
+			// get only the schedule that applies to today
+			let schedule = this.odata.station[this.weekday_key[now.getDay()]]
+			// if we haven't separated the departures yet
+			if(schedule.out == undefined){
+				// create separate lists for outgoing and returning
+				schedule.out=[]
+				schedule.ret =[]
+				for(let departure of schedule.lines ){
+					if(departure[0] !=="")
+						schedule.out.push(departure[0])
+					if(departure[1] !=="")            
+						schedule.ret.push(departure[1])
+				}
+			}
+			// get the limit of elements to show
+			let display_count = this.config.nextDepartures 
+			
+			// create headings
+			let table=this.createElement("div",wrapper,this.config.classes["table"])
 
-        // if we should show either the schedule name (day of week, lv, s,d)  or the schedule label (leave/return)
-        if(this.config.showscheduleName == true || this.config.schedule_label !== undefined){       
-          table=this.createElement("div",table,this.config.classes["tableBody"] )
+			// add heading
+			row=this.createElement("div",table,this.config.classes["tableRow"])
+				this.createElement("div",row, this.config.classes["tableHeading1"], this.config.lineHeading1+" "+this.config.line)
+			// start and end station names
+			row=this.createElement("div",table,this.config.classes["tableRow"])
+				this.createElement("div",row,this.config.classes["tableHeading2"], this.config.lineHeading2+" "+ schedule.in_stop_name +" <-> "+schedule.out_stop_name)
+
+			// if we should show either the schedule name (day of week, lv, s,d)  or the schedule label (leave/return)
+			if(this.config.showscheduleName == true || this.config.schedule_label !== undefined){       
+				table=this.createElement("div",table,this.config.classes["tableBody"] )
               
-                // the schedule lable (lv = mon-fri, s = sat, d = sun), if requested
-                if(this.config.showscheduleName !== undefined && this.config.showscheduleName == true){   
+				// the schedule lable (lv = mon-fri, s = sat, d = sun), if requested
+				if(this.config.showscheduleName !== undefined && this.config.showscheduleName == true){   
 																		row=this.createElement("div",table,this.config.classes["tableRow"])              
-                  this.createElement("div",row,this.config.classes["scheduleHeading"], this.config.dayLabel +" "+this.weekday_key[now.getDay()])
-                }
-                // and any label the user wants to show
-                if(this.config.schedule_label !== undefined){ 
-                  row=this.createElement("div",table,this.config.classes["tableRow"])               
-                  this.createElement("div",row,this.config.classes["scheduleLabel"], this.config.schedule_label) 
-                }
-        }
-        //let table=this.createElement("div",wrapper,this.config.classes["table"])         
-        // now create the table of useful departure times
-        body=this.createElement("div",table,this.config.classes["tableBody"] )    
-        // loop thru the scheduled departures
-        // getting up to display_count entries after the current time (including any travel to stop time)
-        let leave = this.getTimes(schedule.out,current_time,display_count)
-        let ret = this.getTimes(schedule.ret,current_time, display_count)
-        if(this.config.showEarliestDeparture){
-        // in the lengths are uneven 
-        if(leave.length <ret.length)
-          //add an entry to leave side
-          leave.unshift(" ")
-        else{
-          // if the leave time is greater than the return time
-          if(this.compareTime(leave[0], ret[0])>0)
-            // add a dummy entry to the leave side
-            leave.unshift(" ")
-        }
-	}
-        // loop thru the selected departure times,
-        // using the highest count
-        for(let c =0; c<Math.max(leave.length,ret.length); c++){
-            // create the row
-            row=this.createElement("div",body,this.config.classes["tableRow"])
-            // get the data for the 1st leave cell
-            let str = c>=leave.length? " ": leave[c]
-            // if its not empty
-            if(str !== " ")
-              // add it now
-              this.createElement("div",row,this.config.classes["tableCell"], str +"->")             
-            else            
-              // else add a blank cell in its place
-              this.createElement("div",row,this.config.classes["tableCell"], " ")  
-            // get the return departure time
-            str = c>=ret.length? " ":ret[c]
-            // if its not empty
-            if(str !== " ")
-              // add it now
-              this.createElement("div",row,this.config.classes["tableCell"], "<-"+str )               
-            else            
-              // else add a blank cell in its place
-              this.createElement("div",row,this.config.classes["tableCell"], " ")             
-        }
+					this.createElement("div",row,this.config.classes["scheduleHeading"], this.config.dayLabel +" "+this.weekday_key[now.getDay()])
+				}
+				// and any label the user wants to show
+				if(this.config.schedule_label !== undefined){ 
+					row=this.createElement("div",table,this.config.classes["tableRow"])               
+					this.createElement("div",row,this.config.classes["scheduleLabel"], this.config.schedule_label) 
+				}
+			}         
+			// now create the table of useful departure times
+			body=this.createElement("div",table,this.config.classes["tableBody"] )    
+			// loop thru the scheduled departures
+			// getting up to display_count entries after the current time (including any travel to stop time)
+			let leave = this.getTimes(schedule.out,current_time,display_count)
+			let ret = this.getTimes(schedule.ret,current_time, display_count)
+		  // if we should highlight the earliest departure time
+			if(this.config.showEarliestDeparture){
+				// if the lengths are uneven 
+				if(leave.length <ret.length && this.compareTime(leave[0], ret[0])>0)
+					//add an entry to leave side
+					leave.unshift(" ")
+				else{
+					// if the leave time is greater than the return time
+					if(this.compareTime(leave[0], ret[0])>0)
+					// add a dummy entry to the leave side
+					leave.unshift(" ")
+				}
+			}
+			// loop thru the selected departure times,
+			// using the highest count
+			for(let c =0; c<Math.max(leave.length,ret.length); c++){
+				// create the row
+				row=this.createElement("div",body,this.config.classes["tableRow"])
+				// get the data for the 1st leave cell
+				let str = c>=leave.length? " ": leave[c]
+				// if its not empty
+				if(str !== " ")
+					// add it now
+					this.createElement("div",row,this.config.classes["tableCell"], str +"->")             
+				else            
+					// else add a blank cell in its place
+					this.createElement("div",row,this.config.classes["tableCell"], " ")  
+				// get the return departure time
+				str = c>=ret.length? " ":ret[c]
+				// if its not empty
+				if(str !== " ")
+					// add it now
+					this.createElement("div",row,this.config.classes["tableCell"], "<-"+str )               
+				else            
+					// else add a blank cell in its place
+					this.createElement("div",row,this.config.classes["tableCell"], " ")             
+			}
     }
     else{
       // if user supplied message text in its module config, use it
@@ -233,8 +243,8 @@ row=this.createElement("div",table,this.config.classes["tableRow"])
       }
     }
 
-		// pass the created content back to MM to add to DOM.
-		return wrapper;
+	// pass the created content back to MM to add to DOM.
+	return wrapper;
 	},
 
 })
