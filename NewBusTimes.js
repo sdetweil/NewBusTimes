@@ -139,8 +139,13 @@ Module.register(mn, {
     //wrapper.className=mn
 		if(this.config.float!== ""){
 			document.getElementById(this.identifier).style.float=this.config.float;
-			if(this.config.spacing !=="")
-				document.getElementById(this.identifier).style.marginLeft=this.config.spacing
+			
+			if(this.config.spacing !==""){
+				if(this.config.float === "left")
+					document.getElementById(this.identifier).style.marginLeft=this.config.spacing
+				else if(this.config.float === "right")
+					document.getElementById(this.identifier).style.marginRight=this.config.spacing
+			}
 		}	
 
     // if we have data from the bus schedule system
